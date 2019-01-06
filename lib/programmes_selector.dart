@@ -1,9 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:verlichting/credentials.dart';
+import 'package:verlichting/authenticated_request.dart';
 
 class ProgrammesSelectorWidget extends StatefulWidget {
   final String title = "Programmes";
@@ -38,12 +37,7 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
       _loading = true;
     });
 
-    String basicAuth = 'Basic ' +
-        base64Encode(utf8
-            .encode('${CONNECTION_INFO.username}:${CONNECTION_INFO.password}'));
-
-    return http.get(CONNECTION_INFO.host + "/available_programmes",
-        headers: {HttpHeaders.authorizationHeader: basicAuth}).then((response) {
+    return AuthenticatedRequest.get("/available_programmes").then((response) {
       List<Programme> programmes = [];
 
       var programmesJson = jsonDecode(response.body)["availableProgrammes"];
@@ -125,15 +119,9 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
   }
 
   _programmeSelected(Programme programme) {
-    var url = "/programme/${programme.id}/start";
+    var path = "/programme/${programme.id}/start";
 
-    String basicAuth = 'Basic ' +
-        base64Encode(utf8
-            .encode('${CONNECTION_INFO.username}:${CONNECTION_INFO.password}'));
-
-    http.post(CONNECTION_INFO.host + url,
-        headers: {HttpHeaders.authorizationHeader: basicAuth}).then((response) {
-
+    AuthenticatedRequest.post(path).then((_) {
       setState(() {
         _currentProgramme = programme;
       });
