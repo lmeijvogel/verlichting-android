@@ -21,16 +21,13 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
   void initState() {
     super.initState();
 
-    _loadProgrammes().then((_) { _loadCurrentProgramme(); });
+    _loadProgrammes().then((_) {
+      _loadCurrentProgramme();
+    });
   }
 
   void _programmesLoaded(List<Programme> programmes) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
       _programmes = programmes;
       _loading = false;
     });
@@ -57,63 +54,44 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
 
       _programmesLoaded(programmes);
     });
-
   }
 
   _currentProgrammeLoaded(String programmeId) {
     setState(() {
-      _currentProgramme = _programmes.firstWhere((programme) { return programme.id == programmeId; });
+      _currentProgramme = _programmes.firstWhere((programme) {
+        return programme.id == programmeId;
+      });
     });
   }
 
   _loadCurrentProgramme() {
-    String basicAuth = 'Basic ' +
-        base64Encode(utf8
-            .encode('${CONNECTION_INFO.username}:${CONNECTION_INFO.password}'));
+    AuthenticatedRequest.get("/current_programme").then((response) {
+      var programmeJson = jsonDecode(response.body);
 
-    http.get(CONNECTION_INFO.host + "/current_programme",
-        headers: {HttpHeaders.authorizationHeader: basicAuth}).then((response) {
-
-          var programmeJson = jsonDecode(response.body);
-
-          _currentProgrammeLoaded(programmeJson["programme"]);
+      _currentProgrammeLoaded(programmeJson["programme"]);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    var programmeButtons = _programmeButtons();
+
     var contents = _programmeButtons();
+
+    contents.addAll(programmeButtons);
 
     contents.add(new RaisedButton(
         onPressed: _loadProgrammes, child: new Text("Reload programmes")));
 
     if (_loading) {
-      return Center(
-        child: CircularProgressIndicator()
-      );
+      return Center(child: CircularProgressIndicator());
     } else {
-      return Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: contents,
-        ),
-      );
+      var center = Center(
+          child: ListView(
+        children: contents,
+        padding: new EdgeInsets.symmetric(vertical: 0, horizontal: 80),
+      ));
+      return center;
     }
   }
 
