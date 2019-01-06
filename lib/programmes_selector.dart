@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:verlichting/authenticated_request.dart';
 
 final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = new GlobalKey();
@@ -16,7 +15,7 @@ class ProgrammesSelectorWidget extends StatefulWidget {
 class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
   bool _loading = false;
   bool _errorLoading = false;
-  String _programmeActivationError = null;
+  String _programmeActivationError;
 
   List<Programme> _programmes;
   Programme _currentProgramme;
