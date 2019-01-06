@@ -50,19 +50,11 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
     });
   }
 
-  _currentProgrammeLoaded(String programmeId) {
-    setState(() {
-      _currentProgramme = _programmes.firstWhere((programme) {
-        return programme.id == programmeId;
-      });
-    });
-  }
-
   _loadCurrentProgramme() {
     AuthenticatedRequest.get("/current_programme").then((response) {
       var programmeJson = jsonDecode(response.body);
 
-      _currentProgrammeLoaded(programmeJson["programme"]);
+      _selectProgrammeById(programmeJson["programme"]);
     });
   }
 
@@ -120,10 +112,19 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
   _programmeSelected(Programme programme) {
     var path = "/programme/${programme.id}/start";
 
-    AuthenticatedRequest.post(path).then((_) {
-      setState(() {
-        _currentProgramme = programme;
-      });
+    AuthenticatedRequest.post(path).then((response) {
+      var responseJson = jsonDecode(response.body);
+
+      _selectProgrammeById(responseJson["programme"]);
+    });
+  }
+
+  _selectProgrammeById(String programmeId) {
+    setState(() {
+      var programme =
+          _programmes.firstWhere((programme) => programme.id == programmeId);
+
+      _currentProgramme = programme;
     });
   }
 }
