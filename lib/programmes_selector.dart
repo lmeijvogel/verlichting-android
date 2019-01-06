@@ -15,6 +15,9 @@ class ProgrammesSelectorWidget extends StatefulWidget {
 
 class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
   bool _loading = false;
+  bool _errorLoading = false;
+  String _programmeActivationError = null;
+
   List<Programme> _programmes;
   Programme _currentProgramme;
 
@@ -29,15 +32,17 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
     setState(() {
       _programmes = programmes;
       _loading = false;
+      _errorLoading = false;
     });
   }
 
-  Future<void> _loadProgrammes() {
+  Future<void> _loadProgrammes() async {
     setState(() {
       _loading = true;
+      _errorLoading = false;
     });
 
-    return AuthenticatedRequest.get("/available_programmes").then((response) {
+    AuthenticatedRequest.get("/available_programmes").then((response) {
       List<Programme> programmes = [];
 
       var programmesJson = jsonDecode(response.body)["availableProgrammes"];
@@ -47,6 +52,11 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
       });
 
       _programmesLoaded(programmes);
+    }, onError: (error) {
+      setState(() {
+        _loading = false;
+        _errorLoading = true;
+      });
     });
   }
 
@@ -55,6 +65,11 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
       var programmeJson = jsonDecode(response.body);
 
       _selectProgrammeById(programmeJson["programme"]);
+    }).catchError((error) {
+      setState(() {
+        _loading = false;
+        _errorLoading = true;
+      });
     });
   }
 
@@ -62,6 +77,15 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
   Widget build(BuildContext context) {
     if (_loading) {
       return Center(child: CircularProgressIndicator());
+    } else if (_errorLoading) {
+      return Center(
+        child: RefreshIndicator(
+            key: _refreshIndicatorKey,
+            onRefresh: _refresh,
+            child: ListView(children: [
+              Text("Error loading programmes"),
+            ])),
+      );
     } else {
       return Center(
           child: RefreshIndicator(
@@ -89,13 +113,18 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
       var active =
           _currentProgramme != null && (programme.id == _currentProgramme.id);
 
-      if (active) {
+      var hasError = programme.id == _programmeActivationError;
+
+      if (active || hasError) {
+        var buttonColor =
+            hasError ? Colors.red : active ? Colors.blue : Colors.white;
+
         return RaisedButton(
           onPressed: () {
             _programmeSelected(programme);
           },
           child: Text(programme.name),
-          color: Colors.blue,
+          color: buttonColor,
           textColor: Colors.white,
         );
       } else {
@@ -116,6 +145,10 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
       var responseJson = jsonDecode(response.body);
 
       _selectProgrammeById(responseJson["programme"]);
+    }).catchError((error) {
+      setState(() {
+        _programmeActivationError = programme.id;
+      });
     });
   }
 
@@ -125,6 +158,7 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
           _programmes.firstWhere((programme) => programme.id == programmeId);
 
       _currentProgramme = programme;
+      _programmeActivationError = null;
     });
   }
 }
