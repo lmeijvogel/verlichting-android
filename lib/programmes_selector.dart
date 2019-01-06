@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:verlichting/authenticated_request.dart';
 
+final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = new GlobalKey();
+
 class ProgrammesSelectorWidget extends StatefulWidget {
   final String title = "Programmes";
 
@@ -20,9 +22,7 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
   void initState() {
     super.initState();
 
-    _loadProgrammes().then((_) {
-      _loadCurrentProgramme();
-    });
+    _refresh();
   }
 
   void _programmesLoaded(List<Programme> programmes) {
@@ -68,25 +68,24 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var programmeButtons = _programmeButtons();
-
-    var contents = _programmeButtons();
-
-    contents.addAll(programmeButtons);
-
-    contents.add(new RaisedButton(
-        onPressed: _loadProgrammes, child: new Text("Reload programmes")));
-
     if (_loading) {
       return Center(child: CircularProgressIndicator());
     } else {
-      var center = Center(
-          child: ListView(
-        children: contents,
-        padding: new EdgeInsets.symmetric(vertical: 0, horizontal: 80),
-      ));
-      return center;
+      return Center(
+          child: RefreshIndicator(
+              key: _refreshIndicatorKey,
+              onRefresh: _refresh,
+              child: ListView(
+                children: _programmeButtons(),
+                padding: new EdgeInsets.symmetric(vertical: 0, horizontal: 80),
+              )));
     }
+  }
+
+  Future<void> _refresh() {
+    return _loadProgrammes().then((_) {
+      _loadCurrentProgramme();
+    });
   }
 
   List<Widget> _programmeButtons() {
