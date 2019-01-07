@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:verlichting/lights_adjuster.dart';
 import 'package:verlichting/programmes_selector.dart';
 
 void main() => runApp(MyApp());
@@ -8,7 +9,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Verlichting',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -45,7 +46,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Widget programmesSelectorWidget = new ProgrammesSelectorWidget();
+  int _currentWidgetIndex = 0;
+
+  final List<Widget> _widgets = [
+    new ProgrammesSelectorWidget(),
+    new LightsAdjusterWidget()
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -61,25 +67,32 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: programmesSelectorWidget,
+      body: _widgets[_currentWidgetIndex],
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0, // this will be set when a new tab is tapped
+        currentIndex: _currentWidgetIndex, // this will be set when a new tab is tapped
         items: [
           BottomNavigationBarItem(
             icon: new Icon(Icons.list),
             title: new Text('Programmes'),
           ),
-          BottomNavigationBarItem(
-            icon: new Icon(Icons.date_range),
-            title: new Text('Vacation mode'),
-          ),
+//          BottomNavigationBarItem(
+//            icon: new Icon(Icons.date_range),
+//            title: new Text('Vacation mode'),
+//          ),
           BottomNavigationBarItem(
               icon: Icon(Icons.lightbulb_outline),
               title: Text('Lights')
           )
         ],
+        onTap: _onTabTapped,
     )
     );
+  }
+
+  _onTabTapped(int index) {
+    setState(() {
+      _currentWidgetIndex = index;
+    });
   }
 
 }
