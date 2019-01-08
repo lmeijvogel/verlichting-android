@@ -18,7 +18,7 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
   String _programmeActivationError;
 
   List<Programme> _programmes;
-  Programme _currentProgramme;
+  String _currentProgrammeId;
 
   @override
   void initState() {
@@ -98,9 +98,8 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
   }
 
   Future<void> _refresh() {
-    return _loadProgrammes().then((_) {
-      _loadCurrentProgramme();
-    });
+    _loadProgrammes();
+    _loadCurrentProgramme();
   }
 
   List<Widget> _programmeButtons() {
@@ -109,8 +108,7 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
     }
 
     return _programmes.map((programme) {
-      var active =
-          _currentProgramme != null && (programme.id == _currentProgramme.id);
+      var active = programme.id == _currentProgrammeId;
 
       var hasError = programme.id == _programmeActivationError;
 
@@ -153,10 +151,7 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
 
   _selectProgrammeById(String programmeId) {
     setState(() {
-      var programme =
-          _programmes.firstWhere((programme) => programme.id == programmeId);
-
-      _currentProgramme = programme;
+      _currentProgrammeId = programmeId;
       _programmeActivationError = null;
     });
   }
