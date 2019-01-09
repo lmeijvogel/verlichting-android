@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:verlichting/authenticated_request.dart';
+import 'package:verlichting/light_state_dialog.dart';
 import 'package:verlichting/models/light.dart';
 
 final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = new GlobalKey();
@@ -39,31 +40,12 @@ class _LightsAdjusterState extends State<LightsAdjusterWidget> {
     });
 
     AuthenticatedRequest.get("/current_lights").then((jsonResponse) {
-      List<Light> lights = [];
-
       var lightsJson = jsonResponse.payload["lights"];
 
-      lightsJson.forEach((light) {
-        var newLight;
-        switch (light["activation_type"]) {
-          case "switch":
-            newLight = new SwitchableLight(
-                light["node_id"],
-                light["name"],
-                light["display_name"],
-                light["state"]);
-            break;
-          case "dim":
-            newLight = new DimmableLight(
-              light["node_id"],
-              light["name"],
-              light["display_name"],
-              light["value"],
-            );
-            break;
-        }
+      List<Light> lights = [];
 
-        lights.add(newLight);
+      lightsJson.forEach((lightJson) {
+        lights.add(Light.fromJson(lightJson));
       });
 
       _lightsLoaded(lights);

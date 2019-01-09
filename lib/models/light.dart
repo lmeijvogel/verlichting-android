@@ -94,6 +94,22 @@ abstract class Light {
   Future<NewLightState> toggle(bool newState);
 
   applyState(NewLightState newLightState);
+
+  static Light fromJson(light) {
+    switch (light["activation_type"]) {
+      case "switch":
+        return new SwitchableLight(light["node_id"], light["name"],
+            light["display_name"], light["state"]);
+      case "dim":
+        return new DimmableLight(
+          light["node_id"],
+          light["name"],
+          light["display_name"],
+          light["value"],
+        );
+        break;
+    }
+  }
 }
 
 class NewLightState {
