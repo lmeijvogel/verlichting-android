@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:verlichting/authenticated_request.dart';
+import 'package:verlichting/models/programme.dart';
 
 final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = new GlobalKey();
 
@@ -155,11 +156,4 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
       _programmeActivationError = null;
     });
   }
-}
-
-class Programme {
-  String id;
-  String name;
-
-  Programme(this.id, this.name);
 }
