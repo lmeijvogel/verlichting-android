@@ -42,7 +42,7 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
       _errorLoading = false;
     });
 
-    AuthenticatedRequest.get("/available_programmes").then((response) {
+    return AuthenticatedRequest.get("/available_programmes").then((response) {
       List<Programme> programmes = [];
 
       var programmesJson = jsonDecode(response.body)["availableProgrammes"];
@@ -60,8 +60,8 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
     });
   }
 
-  _loadCurrentProgramme() {
-    AuthenticatedRequest.get("/current_programme").then((response) {
+  Future<void>_loadCurrentProgramme() {
+    return AuthenticatedRequest.get("/current_programme").then((response) {
       var programmeJson = jsonDecode(response.body);
 
       _selectProgrammeById(programmeJson["programme"]);
@@ -99,8 +99,10 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
   }
 
   Future<void> _refresh() {
-    _loadProgrammes();
-    _loadCurrentProgramme();
+    return Future.wait<void>([
+     _loadProgrammes(),
+    _loadCurrentProgramme()
+    ]);
   }
 
   List<Widget> _programmeButtons() {
