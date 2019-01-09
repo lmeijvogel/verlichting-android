@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:verlichting/authenticated_request.dart';
 
 class DimmableLight extends Light {
@@ -29,8 +27,8 @@ class DimmableLight extends Light {
     }
 
     return AuthenticatedRequest.post("/light/$nodeId/level/$newValue")
-        .then((response) {
-      var levelFromServer = jsonDecode(response.body)["level"];
+        .then((jsonResponse) {
+      var levelFromServer = jsonResponse.payload["level"];
 
       value = levelFromServer;
 
@@ -60,8 +58,8 @@ class SwitchableLight extends Light {
   @override
   Future<NewLightState> toggle(bool newState) {
     return AuthenticatedRequest.post("/light/$nodeId/switch/${newState ? "on" : "off"}")
-        .then((response) {
-      var stateFromServer = jsonDecode(response.body)["state"];
+        .then((jsonResponse) {
+      var stateFromServer = jsonResponse.payload["state"];
 
       this.state = stateFromServer;
 

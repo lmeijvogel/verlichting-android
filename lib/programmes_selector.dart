@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:verlichting/authenticated_request.dart';
 import 'package:verlichting/models/programme.dart';
@@ -42,10 +40,10 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
       _errorLoading = false;
     });
 
-    return AuthenticatedRequest.get("/available_programmes").then((response) {
+    return AuthenticatedRequest.get("/available_programmes").then((jsonResponse) {
       List<Programme> programmes = [];
 
-      var programmesJson = jsonDecode(response.body)["availableProgrammes"];
+      var programmesJson = jsonResponse.payload["availableProgrammes"];
 
       programmesJson.forEach((key, value) {
         programmes.add(new Programme(key, value));
@@ -61,10 +59,8 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
   }
 
   Future<void>_loadCurrentProgramme() {
-    return AuthenticatedRequest.get("/current_programme").then((response) {
-      var programmeJson = jsonDecode(response.body);
-
-      _selectProgrammeById(programmeJson["programme"]);
+    return AuthenticatedRequest.get("/current_programme").then((jsonResponse) {
+      _selectProgrammeById(jsonResponse.payload["programme"]);
     }).catchError((error) {
       setState(() {
         _loading = false;
@@ -141,10 +137,8 @@ class _ProgrammesSelectorState extends State<ProgrammesSelectorWidget> {
   _programmeSelected(Programme programme) {
     var path = "/programme/${programme.id}/start";
 
-    AuthenticatedRequest.post(path).then((response) {
-      var responseJson = jsonDecode(response.body);
-
-      _selectProgrammeById(responseJson["programme"]);
+    AuthenticatedRequest.post(path).then((jsonResponse) {
+      _selectProgrammeById(jsonResponse.payload["programme"]);
     }).catchError((error) {
       setState(() {
         _programmeActivationError = programme.id;

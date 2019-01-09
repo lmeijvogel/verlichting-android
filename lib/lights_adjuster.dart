@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:verlichting/authenticated_request.dart';
 import 'package:verlichting/models/light.dart';
@@ -40,10 +38,10 @@ class _LightsAdjusterState extends State<LightsAdjusterWidget> {
       _errorLoading = false;
     });
 
-    AuthenticatedRequest.get("/current_lights").then((response) {
+    AuthenticatedRequest.get("/current_lights").then((jsonResponse) {
       List<Light> lights = [];
 
-      var lightsJson = jsonDecode(response.body)["lights"];
+      var lightsJson = jsonResponse.payload["lights"];
 
       lightsJson.forEach((light) {
         var newLight;
