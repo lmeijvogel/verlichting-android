@@ -1,11 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:verlichting/defs.dart';
 import 'package:verlichting/dimmable_light_properties.dart';
 import 'package:verlichting/models/light.dart';
 import 'package:verlichting/switchable_light_properties.dart';
 
 class LightStateDialog extends StatefulWidget {
   final Light _light;
-  final Function _onChange;
+  final OnChangedCallback _onChange;
 
   LightStateDialog(this._light, this._onChange);
 
@@ -39,9 +42,7 @@ class _LightStateDialogState extends State<LightStateDialog> {
     }
   }
 
-  _lightValueChanged(NewLightState newLightState) {
-    setState(() {
-      _onChange(newLightState);
-    });
+  Future<void>_lightValueChanged(NewLightState newLightState) {
+    return _onChange(newLightState);
   }
 }

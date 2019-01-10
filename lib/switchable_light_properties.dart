@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:verlichting/defs.dart';
 import 'package:verlichting/models/light.dart';
 
 class _SwitchableLightState extends State<SwitchableLightProperties> {
   SwitchableLight _light;
   bool _state;
 
-  Function _onChanged;
+  OnChangedCallback _onChanged;
 
   _SwitchableLightState(this._light, this._onChanged) {
     this._state = _light.state;

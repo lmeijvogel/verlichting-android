@@ -109,16 +109,16 @@ class _LightsAdjusterState extends State<LightsAdjusterWidget> {
   _lightTapped(Light light) {
     showDialog(
         context: context,
-        builder: (_) => new LightStateDialog(light, (newLightState) { _lightValueChanged(light, newLightState); })
+        builder: (_) => new LightStateDialog(light, (newLightState) { return _lightValueChanged(light, newLightState); })
     );
   }
 
-  _lightValueChanged(Light light, NewLightState newLightState) {
+  Future<void>_lightValueChanged(Light light, NewLightState newLightState) {
     setState(() {
       light.waiting = true;
     });
 
-    light.applyAndStartState(newLightState).whenComplete(() {
+    return light.applyAndStartState(newLightState).whenComplete(() {
       setState(() {
         light.waiting = false;
       });

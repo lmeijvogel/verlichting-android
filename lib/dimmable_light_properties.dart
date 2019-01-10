@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:verlichting/defs.dart';
 import 'package:verlichting/models/light.dart';
 
 class _DimmableLightState extends State<DimmableLightProperties> {
   Light _light;
   num _value;
 
-  Function _onChanged;
+  OnChangedCallback _onChanged;
 
   _DimmableLightState(this._light, this._onChanged) {
     this._value = _light.value;
