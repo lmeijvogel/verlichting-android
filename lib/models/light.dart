@@ -26,7 +26,23 @@ class DimmableLight extends Light {
       newValue = 0;
     }
 
-    return AuthenticatedRequest.post("/light/$nodeId/level/$newValue")
+    return _setValue(newValue);
+  }
+
+  @override
+  applyState(NewLightState newLightState) {
+    value = newLightState.value.toInt();
+  }
+
+  @override
+  Future<void> applyAndStartState(NewLightState newLightState) {
+    return _setValue(newLightState.value).then((newLightValue) => applyState(newLightState));
+  }
+
+  Future<NewLightState> _setValue(num newValue) {
+    var newIntValue = newValue.toInt();
+
+    return AuthenticatedRequest.post("/light/$nodeId/level/$newIntValue")
         .then((jsonResponse) {
       var levelFromServer = jsonResponse.payload["level"];
 
@@ -38,10 +54,6 @@ class DimmableLight extends Light {
     });
   }
 
-  @override
-  applyState(NewLightState newLightState) {
-    state = newLightState.state;
-  }
 }
 
 class SwitchableLight extends Light {
@@ -71,6 +83,12 @@ class SwitchableLight extends Light {
   applyState(NewLightState newLightState) {
     state = newLightState.state;
   }
+
+  @override
+  Future<void> applyAndStartState(NewLightState newLightState) {
+    // TODO: implement applyAndStartState
+    return null;
+  }
 }
 
 abstract class Light {
@@ -94,8 +112,9 @@ abstract class Light {
   Future<NewLightState> toggle(bool newState);
 
   applyState(NewLightState newLightState);
+  Future<void> applyAndStartState(NewLightState newLightState);
 
-  static Light fromJson(light) {
+  static Light fromJson(dynamic light) {
     switch (light["activation_type"]) {
       case "switch":
         return new SwitchableLight(light["node_id"], light["name"],
@@ -108,6 +127,8 @@ abstract class Light {
           light["value"],
         );
         break;
+      default:
+        throw "Unknown light type ${light["activation_type"]}";
     }
   }
 }
