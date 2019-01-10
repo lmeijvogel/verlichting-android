@@ -86,8 +86,9 @@ class SwitchableLight extends Light {
 
   @override
   Future<void> applyAndStartState(NewLightState newLightState) {
-    // TODO: implement applyAndStartState
-    return null;
+    return toggle(newLightState.state).then((newLightState) {
+      applyState(newLightState);
+    });
   }
 }
 

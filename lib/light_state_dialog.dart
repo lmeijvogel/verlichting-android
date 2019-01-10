@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:verlichting/dimmable_light_properties.dart';
 import 'package:verlichting/models/light.dart';
+import 'package:verlichting/switchable_light_properties.dart';
 
 class LightStateDialog extends StatefulWidget {
   final Light _light;
@@ -32,7 +33,7 @@ class _LightStateDialogState extends State<LightStateDialog> {
     if (light is DimmableLight) {
       return new DimmableLightProperties(light, _lightValueChanged);
     } else if (light is SwitchableLight) {
-      return new Text("Switch");
+      return new SwitchableLightProperties(light, _lightValueChanged);
     } else {
       throw "Invalid dialog type";
     }
